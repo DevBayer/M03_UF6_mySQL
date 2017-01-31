@@ -10,9 +10,11 @@ import java.util.Scanner;
 public class MainTwo {
     static DBManager db = null;
     public static void main(String[] args) throws SQLException {
-        db = new DBManager("172.31.73.162", "sakila", "root", "root");
+        //db = new DBManager("172.31.73.162", "sakila", "root", "root");
+        db = new DBManager("192.168.1.24", "sakila", "root", "root");
         Scanner sc = new Scanner(System.in);
         while(true){
+            String q = null;
             printMenu();
             int option = 0;
             while(option == 0) {
@@ -30,7 +32,7 @@ public class MainTwo {
                     showTables();
                     break;
                 case 3:
-                    String q = null;
+                    System.out.println("Example Query: select * from actor;");
                     while(q == null || q.isEmpty() || q.equals(" ")) {
                         System.out.println("Query: ");
                         q = readInput_String(sc);
@@ -38,8 +40,20 @@ public class MainTwo {
                     doQuery(q);
                     break;
                 case 4:
+                    System.out.println("Example Query: insert into actor (actor_id,first_name,last_name) VALUES (201,'LLUÍS','BAYER');");
+                    while(q == null || q.isEmpty() || q.equals(" ")) {
+                        System.out.println("Query: ");
+                        q = readInput_String(sc);
+                    }
+                    System.out.println(db.insert(q));
                     break;
                 case 5:
+                    System.out.println("Example Query: UPDATE actor SET last_name='BAYER SOLER' WHERE actor_id=201;");
+                    while(q == null || q.isEmpty() || q.equals(" ")) {
+                        System.out.println("Query: ");
+                        q = readInput_String(sc);
+                    }
+                    System.out.println(db.insert(q));
                     break;
                 case 6:
                     if(db.conn != null && !db.conn.isClosed()){

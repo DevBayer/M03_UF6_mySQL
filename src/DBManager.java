@@ -52,6 +52,21 @@ public class DBManager {
         return null;
     }
 
+    public String insert(String q){
+        try {
+            if (conn != null && conn.isValid(1000)) {
+                Statement s = conn.createStatement();
+                int exec = s.executeUpdate(q);
+                 return "("+exec+") query executed";
+            } else {
+                initialize();
+                return insert(q);
+            }
+        }catch(SQLException e){
+            return "Err: "+e.getMessage();
+        }
+    }
+
     private void checkDriver() throws ClassNotFoundException{
         Class.forName("com.mysql.jdbc.Driver");
     }
