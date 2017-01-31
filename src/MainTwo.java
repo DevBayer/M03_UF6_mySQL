@@ -11,8 +11,11 @@ public class MainTwo {
     static DBManager db = null;
     public static void main(String[] args) throws SQLException {
         //db = new DBManager("172.31.73.162", "sakila", "root", "root");
+        // initialize DBManager with the connection parameters
         db = new DBManager("192.168.1.24", "sakila", "root", "root");
+        // initialize Scanner for read input data
         Scanner sc = new Scanner(System.in);
+        // initialize infinite-loop to display the menu
         while(true){
             String q = null;
             printMenu();
@@ -26,9 +29,11 @@ public class MainTwo {
             }
             switch(option){
                 case 1:
+                    // force initialization
                     db.initialize();
                     break;
                 case 2:
+                    // show tables (with a simple query (show tables;)) and prettify with a table-format
                     showTables();
                     break;
                 case 3:
@@ -135,6 +140,7 @@ public class MainTwo {
     }
 
     private static void doQuery(String query) throws SQLException{
+        // print the QueryResult (ResultSet) with a format through column-row
         ResultSet rs = db.query(query);
         if(rs.next()) {
             ResultSetMetaData rsmd = rs.getMetaData();
