@@ -1,7 +1,7 @@
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Types;
+import models.Actor;
+
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -10,9 +10,9 @@ import java.util.Scanner;
 public class MainTwo {
     static DBManager db = null;
     public static void main(String[] args) throws SQLException {
-        //db = new DBManager("172.31.73.162", "sakila", "root", "root");
+        db = new DBManager("172.31.73.152", "sakila", "root", "root");
         // initialize DBManager with the connection parameters
-        db = new DBManager("192.168.1.24", "sakila", "root", "root");
+        //db = new DBManager("192.168.1.24", "sakila", "root", "root");
         // initialize Scanner for read input data
         Scanner sc = new Scanner(System.in);
         // initialize infinite-loop to display the menu
@@ -33,10 +33,14 @@ public class MainTwo {
                     db.initialize();
                     break;
                 case 2:
+                    // show database info (metadata)
+                    showInfoExpanded();
+                    break;
+                case 3:
                     // show tables (with a simple query (show tables;)) and prettify with a table-format
                     showTables();
                     break;
-                case 3:
+                case 4:
                     System.out.println("Example Query: select * from actor;");
                     while(q == null || q.isEmpty() || q.equals(" ")) {
                         System.out.println("Query: ");
@@ -44,7 +48,7 @@ public class MainTwo {
                     }
                     doQuery(q);
                     break;
-                case 4:
+                case 5:
                     System.out.println("Example Query: insert into actor (actor_id,first_name,last_name) VALUES (201,'LLUÍS','BAYER');");
                     while(q == null || q.isEmpty() || q.equals(" ")) {
                         System.out.println("Query: ");
@@ -52,7 +56,7 @@ public class MainTwo {
                     }
                     System.out.println(db.insert(q));
                     break;
-                case 5:
+                case 6:
                     System.out.println("Example Query: UPDATE actor SET last_name='BAYER SOLER' WHERE actor_id=201;");
                     while(q == null || q.isEmpty() || q.equals(" ")) {
                         System.out.println("Query: ");
@@ -60,12 +64,17 @@ public class MainTwo {
                     }
                     System.out.println(db.insert(q));
                     break;
-                case 6:
+                case 7:
+                    System.out.println("THIS IS A SAMPLE VERSION:");
+                    System.out.println("query table actor -> save ResultSet on ArrayList with a Actor Instance");
+                    doUserInteraction();
+                    break;
+                case 8:
                     if(db.conn != null && !db.conn.isClosed()){
                         db.conn.close();
                     }
                     break;
-                case 7:
+                case 9:
                     if(db.conn != null && !db.conn.isClosed()){
                         db.conn.close();
                     }
@@ -85,22 +94,27 @@ public class MainTwo {
             System.out.println("|- status: no connected -|");
         }else{
             System.out.println("|--- status: connected --|");
+            showInfo();
         }
         System.out.println("|------------------------|");
         System.out.println("|========================|");
         System.out.println("|--- 1. init connection -|");
         System.out.println("|========================|");
-        System.out.println("|--- 2. list tables -----|");
+        System.out.println("|--- 2. show serverinfo -|");
         System.out.println("|========================|");
-        System.out.println("|--- 3. do query --------|");
+        System.out.println("|--- 3. list tables -----|");
         System.out.println("|========================|");
-        System.out.println("|--- 4. do insert -------|");
+        System.out.println("|--- 4. do query --------|");
         System.out.println("|========================|");
-        System.out.println("|--- 5. do update -------|");
+        System.out.println("|--- 5. do insert -------|");
         System.out.println("|========================|");
-        System.out.println("|--- 6. close conn ------|");
+        System.out.println("|--- 6. do update -------|");
         System.out.println("|========================|");
-        System.out.println("|--- 7. exit ------------|");
+        System.out.println("|--- 7. instance object -|");
+        System.out.println("|========================|");
+        System.out.println("|--- 8. close conn ------|");
+        System.out.println("|========================|");
+        System.out.println("|--- 9. exit ------------|");
         System.out.println("|========================|");
         System.out.println("|------------------------|");
     }
@@ -123,6 +137,28 @@ public class MainTwo {
         }
         return "";
     }
+
+    private static void showInfo() throws SQLException{
+        if(db.conn != null && db.conn.isValid(1000)) {
+            DatabaseMetaData metadata = db.conn.getMetaData();
+            System.out.println(metadata.getDatabaseProductName() + " - " + metadata.getDatabaseProductVersion());
+        }else{
+            System.out.println("The connection has not open.");
+        }
+    }
+
+    private static void showInfoExpanded() throws SQLException{
+        if(db.conn != null && db.conn.isValid(1000)) {
+            DatabaseMetaData metadata = db.conn.getMetaData();
+            System.out.println("Connected on "+metadata.getURL()+"@"+metadata.getDatabaseProductName());
+            System.out.println(metadata.getDatabaseProductName() + " - " + metadata.getDatabaseProductVersion());
+            System.out.println("Using the driver "+metadata.getDriverName()+" - "+metadata.getDriverVersion());
+
+        }else{
+            System.out.println("The connection has not open.");
+        }
+    }
+
 
     private static void showTables() throws SQLException{
         ResultSet rs = db.query("show tables;");
@@ -180,6 +216,75 @@ public class MainTwo {
                 }
             }
         }
+    }
+
+    private static ArrayList<Actor> getActors() throws  SQLException {
+        ArrayList<Actor> actors = new ArrayList<>();
+        ResultSet rs = db.query("select * from actor;");
+        while(rs.next()) {
+            Actor actor = new Actor();
+            actor.setActor_id(rs.getInt("actor_id"));
+            actor.setFirst_name(rs.getString("first_name"));
+            actor.setLast_name(rs.getString("last_name"));
+            actors.add(actor);
+        }
+        return actors;
+    }
+
+    private static void doUserInteraction() throws SQLException {
+        Boolean interact = true;
+        ArrayList<Actor> actors = getActors();
+        while(interact) {
+            System.out.println("Size Actors: " + actors.size());
+            System.out.println("What do you wanna do?");
+            System.out.println("1. List all data");
+            System.out.println("2. Insert new data");
+            System.out.println("3. Update data");
+            System.out.println("4. Exit Interaction");
+            Scanner sc = new Scanner(System.in);
+            int option = 0;
+            while (option == 0) {
+                System.out.print("Option: ");
+                option = readInput_int(sc);
+                if (option > 0) {
+                    break;
+                }
+            }
+
+            switch (option) {
+                case 1:
+                    System.out.println(String.format("%84s", " ").replace(" ", "-"));
+                    System.out.format("|- %-8s | %-32s | %-32s -|\n", "actor_id", "first_name", "last_name");
+                    for (Actor actor : actors) {
+                        System.out.format("|- %-8d | %-32s | %-32s -|\n", actor.getActor_id(), actor.getFirst_name(), actor.getLast_name());
+                        System.out.println(String.format("%84s", " ").replace(" ", "-"));
+                    }
+                    break;
+
+                case 2:
+                    Actor newActor = new Actor();
+                    System.out.println("Insert form: ");
+                    System.out.println("actor id ?");
+                    newActor.setActor_id(readInput_int(sc));
+                    System.out.println("first name ?");
+                    newActor.setFirst_name(readInput_String(sc));
+                    System.out.println("last name ?");
+                    newActor.setLast_name(readInput_String(sc));
+
+                    newActor.getInsertQuery();
+
+                    actors = getActors();
+                    break;
+
+                case 3:
+
+                    break;
+                case 4:
+                    interact = false;
+                    break;
+            }
+        }
+
     }
 
 }

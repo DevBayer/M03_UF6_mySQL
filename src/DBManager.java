@@ -23,6 +23,7 @@ public class DBManager {
             checkDriver();
         }catch(ClassNotFoundException e){
             System.out.println("DBManager:: the driver for mysql has not found.");
+            System.exit(1);
         }
         this.ipaddress = ipaddress;
         this.database = database;
