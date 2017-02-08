@@ -42,7 +42,17 @@ public class Actor {
     }
 
     public String getInsertQuery(){
-        return "INSERT INTO actor (actor_id, first_name, last_name) VALUES (?, ?, ?)";
+        return "INSERT INTO actor (actor_id, first_name, last_name) VALUES ({0}, {1}, {2})"
+                .replace("{0}", ""+actor_id)
+                .replace("{1}", "'"+first_name+"'")
+                .replace("{2}", "'"+last_name+"'");
+    }
+
+    public String getUpdateQuery(){
+        return "UPDATE actor SET first_name={0}, LAST_NAME={1} WHERE actor_id={2}"
+                .replace("{0}", "'"+first_name+"'")
+                .replace("{1}", "'"+last_name+"'")
+                .replace("{2}", ""+actor_id);
     }
 
 }

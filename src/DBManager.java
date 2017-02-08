@@ -1,3 +1,5 @@
+import models.Actor;
+
 import java.sql.*;
 
 /**
@@ -94,6 +96,30 @@ public class DBManager {
         }catch(SQLException e){
             return "Err: "+e.getMessage();
         }
+    }
+
+    public Actor getActor(int id){
+        try {
+            if (conn != null && conn.isValid(1000)) {
+                // initialize a simple SQL instruction
+                Statement s = conn.createStatement();
+                // table of data representing a database result
+                ResultSet rs = s.executeQuery("select * from actor where actor_id = "+id);
+                while(rs.next()) {
+                    Actor a = new Actor();
+                    a.setActor_id(id);
+                    a.setFirst_name(rs.getString("first_name"));
+                    a.setLast_name((rs.getString("last_name")));
+                    return a;
+                }
+            }else{
+                initialize();
+                return getActor(id);
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

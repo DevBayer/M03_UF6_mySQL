@@ -267,18 +267,44 @@ public class MainTwo {
                     System.out.println("actor id ?");
                     newActor.setActor_id(readInput_int(sc));
                     System.out.println("first name ?");
+                    sc.nextLine(); // force nextline
                     newActor.setFirst_name(readInput_String(sc));
                     System.out.println("last name ?");
                     newActor.setLast_name(readInput_String(sc));
 
-                    newActor.getInsertQuery();
+                    String query = newActor.getInsertQuery();
+                    db.insert(query);
 
                     actors = getActors();
                     break;
 
                 case 3:
+                    System.out.println("ID:");
+                    int id = readInput_int(sc);
+                    sc.nextLine(); // force nextline
+                    Actor actor = db.getActor(id);
+                    if(actor != null) {
+                        System.out.println("First name? (" + actor.getFirst_name() + "): ");
+                        String first_name = readInput_String(sc);
+                        if (!first_name.isEmpty()) {
+                            actor.setFirst_name(first_name);
+                        }
+                        System.out.println("Last name? (" + actor.getLast_name() + "): ");
+                        String last_name = readInput_String(sc);
+                        if (!last_name.isEmpty()) {
+                            actor.setLast_name(last_name);
+                        }
 
+                        String query_upd = actor.getUpdateQuery();
+                        System.out.println(query_upd);
+                        db.insert(query_upd);
+
+                        actors = getActors();
+                    }else{
+                        System.out.println("Unknown actor.");
+                    }
                     break;
+
                 case 4:
                     interact = false;
                     break;
